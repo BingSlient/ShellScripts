@@ -47,8 +47,10 @@ if [ -z $(echo $1|sed 's/[[:digit:]]//g') ]; then
     monthNumToName $1
 else
 # Normalize to first 3 letters, first upper- and the lowercase.
-    month="$(echo $1|cut -c1|tr '[:lower:]' '[:upper:]')"
-    month="$month$(echo $1|cut -c2-3 | tr '[:upper:]' '[:lower]')"
+# Use "cut" utility to get specific chars
+# Use "tr" utility to change chars into lower or upper case
+    month="$(echo $1|cut -c1|tr [:lower:] [:upper:])"  
+    month="$month$(echo $1|cut -c2-3|tr A-Z a-z)"
 fi
 
 echo $month $2 $3
