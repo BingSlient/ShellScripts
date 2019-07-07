@@ -1,0 +1,66 @@
+#!/bin/bash
+# nicenumber -- Given a number, shows it in comma-seperated form. Excepts DD
+# (decimal point delimiter) and TD (thousands delimiter) to be instantiated.
+# Instantiates nicenumber or, if a second flag arg is specified, the output is
+# echoed to stdout
+
+nicenumber()
+{
+    # Note that we assume that '.' is the decimal seperator in the input value
+    # to this script. The decimal seperatro in the output value is '.' unless
+    # specified by the user with the -d flag
+
+    integer=$(echo $1 | cut -d. -f1) # Integer part
+    decimal=$(echo $1 | cut -d. -f2) # Decimal part
+
+    # Check is number has more than the integer part.
+    if [ "$integer" != "$1" ]; then
+        # There is a decimal part, so let's include it.
+        result="${DD:= '.'}$decimal"
+    fi
+
+    thousands=$integer
+
+    while [ $thousands -gt 999 ]; do
+        remainder=$(($thousands % 1000)) # Three least significant digits
+
+        # We need 'remainder' to be three digits.
+        while [ ${#remainder} -lt 3 ]; do
+            remainder="0$remainder"
+        done
+
+        result="${TD:=','}${remainder}${result}" # Combine from right to left
+        thousands=$(($thousands / 1000)) # To left of the remainder, if any
+    done
+
+    nicenum="${thousands}${result}" 
+    if [ ! -z $2 ]; then
+        echo $nicenum
+    fi
+}
+
+DD="." # Decimal point seperator
+TD="," # Thousands delimilter, to seperate every three digits
+
+# BEGIN MAIN SCRIPT
+# =================
+
+while getopts "d:t:" opt; do
+    case $opt in
+        d) DD="$OPTARG" ;;
+        t) TD="$OPTARG" ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
+# Input validation
+if [ $# -eq 0 ]; then
+    echo "Usage: $(basename $0) [-d c] [-t c] number"
+    echo " -d sepecifies the dicimal point delimiter"
+    echo " -t sepecifies the thousands delimilter"
+    exit 0
+fi
+
+nicenumber $1 1 # Second arg forces nicenumber to 'echo' output.
+
+exit 0
