@@ -1,0 +1,111 @@
+#!/bin/bash
+# sysinfo_page -- A script to produce system info in an HTML file
+
+title="System Info for ${HOSTNAME}"
+TIME_STAMP="Updated on $(date +"%F %R %Z") by ${USER}"
+
+show_uptime()
+{
+    echo "<h2>System uptime</h2>"
+    echo "<pre>"
+    uptime
+    echo "</pre>"
+}
+
+drive_space()
+{
+    echo "<h2>System drive space</h2>"
+    echo "<pre>"
+    df -h
+    echo "</pre>"
+}
+
+home_space()
+{
+    echo "<h2>Home directory space by ${USER}</h2>"
+    echo "<pre>"
+    du -h -S ~/* | sort -nr
+    echo "</pre>"
+}
+
+system_info()
+{
+
+    # Find any release flies in /etc
+
+    if ls /etc/*release 1>/dev/null 2>&1; then
+        echo "<h2>System release info</h2>"
+        echo "<pre>"
+        for info in /etc/*release; do
+            head -n 1 ${info}
+        done
+        uname -rpo
+        echo "</pre>"
+    fi
+}
+
+write_page()
+{
+    cat << EOF
+    <html>
+    <head>
+        <title>
+        ${title}
+        </title>
+    </head>
+
+    <body>
+    <h1>${title}</h1>
+    <p>${TIME_STAMP}</p>
+    $(system_info)
+    $(show_uptime)
+    $(drive_space)
+    $(home_space)
+    </body>
+    </html>
+EOF
+}
+
+usage()
+{
+    echo "Usage: $(basename $0) [[[-f file] [-i]] | [-h]]"
+    echo " -f|--file specifies the filename to write"
+    echo " -i|--interactive whether to use interactive mode"
+    echo " -h|--help show usage"
+}
+
+# MAIN SCRIPT STARTS
+###################
+
+interactive=
+filename=./sysinfo_page.html
+
+while [ "$1" != "" ]; do
+    case $1 in
+        -f | --file ) shift; filename=$1 ;;
+        -i | --interactive ) interactive=1 ;;
+        -h | --help ) usage ; exit ;;
+        * ) usage ; exit 1 ;;
+    esac 
+    shift
+done
+
+if [ "$interactive" == "1" ]; then
+    response=
+    echo -n "Enter name of output file [$filename] > "
+    read response
+    if [ -n "${response}" ]; then
+        filename=${response}
+    fi
+    
+    if [ -f ${filename} ]; then
+        echo "Output flie exists. Overwirte? (y/n) > "
+        read response
+        if [ "${response}" != "y" ]; then
+            echo "Exiting program."
+            exit 1
+        fi
+    fi
+fi
+
+write_page > ${filename}

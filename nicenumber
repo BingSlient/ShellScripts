@@ -16,7 +16,7 @@ nicenumber()
     # Check is number has more than the integer part.
     if [ "$integer" != "$1" ]; then
         # There is a decimal part, so let's include it.
-        result="${DD:= '.'}$decimal"
+        result="${DD:='.'}$decimal"
     fi
 
     thousands=$integer
