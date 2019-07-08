@@ -1,0 +1,103 @@
+#!/bin/bash
+# parameter_expansion -- A script to show how shell parameter expansion work
+# Including expansions:
+# ${parameter:- \$HOME} -- If parameter is unset or null, the expansion of
+# $HOME is used. Otherwise, the value of parameter is used.
+# ${parameter:= \$HOME} -- If parameter is unset or null, the expansion of
+# $HOME is assigned to parameter so the value of parameter chages.
+# ${parameter:? \$USER} -- If parameter is unset or null, the expansion of
+# $USER is wiritten to standard error and the shell, if it is not interactive
+# exist. Otherwise use the value of parameter.
+# ${parameter:+ \$USER} -- If parameter is unset or null, do nothing.
+# Otherwise, use the value of $USER
+
+
+press_enter()
+{
+    echo -en "\nPress Enter to continue"
+    read
+    # clear
+}
+
+show_menu()
+{
+    echo "##########################"
+    echo "A Program that show how shell parameter expansion work"
+    echo 'Including expansions:
+    1. ${parameter:- $HOME} -- If parameter is unset or null, the expansion of
+       $HOME is used. Otherwise, the value of parameter is used.
+    2. ${parameter:= $HOME} -- If parameter is unset or null, the expansion of
+       $HOME is assigned to parameter so the value of parameter chages.
+    3. ${parameter:? $USER} -- If parameter is unset or null, the expansion of
+       $USER is wiritten to standard error and the shell, if it is not interactive
+       exist. Otherwise use the value of parameter.
+    4. ${parameter:+ $USER} -- If parameter is unset or null, do nothing.
+       Otherwise, use the value of $USER'
+    echo "##########################"
+    echo "Initiate varible parameter as null"
+
+    echo "
+    PROGRAM MENU
+    1 -- Do \${parameter:- \$HOME} test
+    2 -- Do \${parameter:= \$HOME} test
+    3 -- Do \${parameter:? \$USER} test
+    4 -- Do \${parameter:+ \$USER} test
+    5 -- Unset parameter
+    6 -- Show Menu
+
+    0 -- Exit program
+    "
+}
+
+# Parameter expansion test
+parameter=
+
+##############
+# PROGRAM MENU
+##############
+
+show_menu
+selection=
+until [ "$seleciton" = "0" ]; do
+    echo -n "Enter selection:"
+    read seleciton 
+    case $seleciton in 
+        1 ) # ${parameter:- word}
+            echo "parameter's initial value: $parameter" 
+            echo 'Do echo ${parameter:- $HOME}:'
+            echo ${parameter:- $HOME}
+            echo "parameter now becomes: $parameter"
+            press_enter
+            ;;
+        2 ) # ${parameter:= word}
+            echo "parameter's initial value: $parameter" 
+            echo 'Do echo ${parameter:= $HOME}:'
+            echo ${parameter:= $HOME}
+            echo "parameter now becomes: $parameter"
+            press_enter
+            ;;
+        3 ) # ${parameter:? word}
+            echo "parameter's initial value: $parameter" 
+            echo 'Do echo ${parameter:? $USER}:' 
+            echo ${parameter:? $USER}
+            echo "parameter now becomes: $parameter"
+            press_enter
+            ;;
+        4 ) # ${parameter:+ word}
+            echo "parameter's initial value: $parameter" 
+            echo 'Do echo ${parameter:? $USER}:' 
+            echo ${parameter:+ $USER}
+            echo "parameter now becomes: $parameter"
+            press_enter
+            ;;
+        5 ) echo 'unset parameter'
+            unset parameter
+            echo "parameter now becomes: $parameter"
+            ;;
+        6 ) clear; show_menu ;;
+        0 ) echo 'Exit Program'; exit 0
+            ;;
+        * ) echo "Please enter selection above" 
+            press_enter
+    esac
+done
