@@ -46,7 +46,7 @@ system_info()
 
 write_page()
 {
-    cat << EOF
+    cat <<- EOF
     <html>
     <head>
         <title>
